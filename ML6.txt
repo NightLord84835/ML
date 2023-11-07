@@ -1,0 +1,31 @@
+import pandas as pd
+import csv
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori,association_rules
+
+dataset=[]
+with open('Market_Basket_Optimisation.csv') as file:
+  reader = csv.reader(file, delimiter=',')
+  for row in reader:
+    dataset += [row]
+dataset
+
+te = TransactionEncoder()
+x = te.fit_transform(dataset)
+x
+
+df = pd.DataFrame(x,columns=te.columns_)
+df
+
+freq_item = apriori(df, min_support=0.01, use_colnames=True)
+freq_item
+
+rules = association_rules(freq_item, metric='confidence', min_threshold=0.25)
+rules = rules[['antecedents','consequents','support','confidence']]
+rules
+
+rules[rules['antecedents']=={'burgers'}]
+
+pivot_table = rules.pivot(index='antecedents', columns='consequents', values='confidence')
+sns.heatmap(pivot_table)
+plt.show()

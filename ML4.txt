@@ -1,0 +1,43 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv("/content/Spamham.csv")
+df
+
+df['Ham'] = df['Category'].apply(lambda x:1 if x=='ham' else 0)
+df
+
+x  = df['Message']
+y = df['Ham']
+
+from sklearn.model_selection import train_test_split
+xtrain, xtest,ytrain,ytest = train_test_split(x,y)
+
+from sklearn.feature_extraction.text import CountVectorizer
+v = CountVectorizer()
+x_train_count = v.fit_transform(xtrain)
+x_train_count = x_train_count.toarray()
+x_train_count.shape
+
+from sklearn.naive_bayes import MultinomialNB
+mnb = MultinomialNB()
+mnb.fit(x_train_count,ytrain)
+x_test_count = v.transform(xtest)
+y_pred = mnb.predict(x_test_count)
+
+from sklearn.metrics import classification_report, ConfusionMatrixDisplay
+print(classification_report(ytest,y_pred))
+
+print(ConfusionMatrixDisplay.from_predictions(ytest,y_pred))
+
+from sklearn.naive_bayes import GaussianNB
+gnb =  GaussianNB()
+gnb.fit(x_train_count,ytrain)
+x_test_count = x_test_count.toarray()
+y_pred_gnb = gnb.predict(x_test_count)
+
+print(classification_report(ytest,y_pred_gnb))
+
+print(ConfusionMatrixDisplay.from_predictions(ytest,y_pred_gnb))
